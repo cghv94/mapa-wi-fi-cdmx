@@ -1,0 +1,73 @@
+---
+title: "Mapa de Wi-Fi gratuito y botones de pánico en la CDMX"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+    social: [ "twitter", "facebook", "menu"]
+    source_code: embed
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(readxl)
+library(sp)
+library(rgdal)
+library(ggplot2)
+library(maptools)
+library(tmaptools)
+library(dplyr)
+library(tmap)
+library(shinyjs)
+library(colorspace)
+library(rgeos)
+library(leaflet)
+```
+
+```{r include=FALSE}
+capa_wifi<-readOGR(dsn="/cloud/project",layer="ubicacion-acceso-gratuito-internet-wifi-c5")
+```
+
+Mapa
+=====================================
+
+### Ubicación de puntos de acceso gratuito a internet WiFi y botones de pánico vía infraestructura C5 (actuales y próximos)
+
+```{r}
+paleta_cdmx1<-colorFactor(palette = c("purple","blue"), 
+                           domain=capa_wifi$estatus_con)
+paleta_cdmx2<-colorFactor(palette = c("green","yellow","red"), 
+                           domain=capa_wifi$boton)
+
+# Creando un mapa sobre wifi gratuito y botones de pánico en la colonia Centro
+
+wifi_cdmx<-leaflet() %>% setView(lng = -99.133209, lat = 19.432608, zoom = 11)
+wifi_cdmx %>% addTiles() %>% addCircles(data=capa_wifi,
+                                          color = ~paleta_cdmx1(estatus_con),
+                                          weight=10,stroke = T,fillOpacity = 0.75,
+                                          label = capa_wifi$estatus_con)%>%
+  addCircles(data=capa_wifi,color = ~paleta_cdmx2(boton),weight=10,stroke = F,
+             fillOpacity = 0.75,label = capa_wifi$boton)
+```
+
+Fuentes
+===========================================
+
+Elaboración propia con información de Datos Abiertos Ciudad de México.
+
+Disponible en:
+
+https://datos.cdmx.gob.mx/explore/dataset/ubicacion-acceso-gratuito-internet-wifi-c5/export/
+
+Créditos
+========================================
+
+Created by: Cesar Hernández
+
+Correo: cghv94@outlook.es
+
+Twitter: @[cghv94](https://twitter.com/cghv94)
+
+Esta obra fue generada mediante R en `r format(Sys.Date(), format = "%B %d, %Y")` y está bajo una [licencia de Creative Commons, Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode.es).
+
+Creative Commons (CC).
